@@ -16,12 +16,27 @@ function draw() {
   }
 
   if (pg) {
-    // 在 pg 上繪製一些範例內容 (例如：黃色外框與文字)
-    pg.clear(); // 保持背景透明
-    pg.stroke(255, 255, 0);
-    pg.strokeWeight(20);
-    pg.noFill();
-    pg.rect(0, 0, pg.width, pg.height); // 繪製與視訊同寬高的邊框
+    pg.clear();
+    capture.loadPixels();
+    let stepSize = 20;
+
+    // 遍歷攝影機影像的每個 20x20 單位
+    for (let y = 0; y < capture.height; y += stepSize) {
+      for (let x = 0; x < capture.width; x += stepSize) {
+        // 取得該單位起始像素的索引位置
+        let i = (y * capture.width + x) * 4;
+        let r = capture.pixels[i];
+        let g = capture.pixels[i + 1];
+        let b = capture.pixels[i + 2];
+
+        // 計算黑白平均值 (R+G+B)/3
+        let avg = (r + g + b) / 3;
+
+        pg.noStroke();
+        pg.fill(avg); // 使用計算出的黑白顏色值
+        pg.rect(x, y, stepSize, stepSize); // 在該單位位置繪製矩形
+      }
+    }
   }
 
   // 計算影像寬高為畫布的 60%
